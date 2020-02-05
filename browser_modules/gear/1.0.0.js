@@ -57,7 +57,7 @@ function main (param) {
   var m = 2;
   var w = b[1].x - b[0].x + m * 2;
   var h = b[1].y - b[0].y + m * 2;
-  o.push(cube({size: [w, h, param.thickness], round: true, radius: 0.5}).translate([b[0].x - m, b[0].y - m, 0]));
+  o.push(cube({size: [w, h, param.thickness], radius: 0.5}).translate([b[0].x - m, b[0].y - m, 0]));
 
   return union(o);
 }
