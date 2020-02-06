@@ -43,8 +43,8 @@ namespace JscadGallery {
 
       if (!document.location.hash.substring(1)) {
         //load the preview
-        const message2: DownloadRequest = { preview: design };
-        this.downloadWorker.postMessage(message2);
+        const message2: WorkerRequest = { load: design };
+        this.worker.postMessage(message2);
       }
 
       //TODO - show spinner while loading
