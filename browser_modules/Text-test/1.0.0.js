@@ -1,5 +1,6 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"Text-test":[function(require,module,exports){
-//this file is a template for converting jscad to a Node module
+
+  //this file is a template for converting jscad to a Node module
 const scadApi = require('@jscad/scad-api')
 const { difference, intersection, union } = scadApi.booleanOps;
 const { CAG, CSG } = scadApi.csg;
@@ -12,15 +13,8 @@ const { cube, cylinder, geodesicSphere, polyhedron, sphere, torus } = scadApi.pr
 const { center, chain_hull, contract, expand, hull, minkowski, mirror, multmatrix } = scadApi.transformations;
 const { vector_char, vector_text } = scadApi.text;
 
-
 ///////////////
 
-// title      : Name Plate
-// author     : Rene K. Mueller
-// license    : MIT License
-// description: create your own name plate
-// date       : 2013/04/24
-// file       : name_plate.jscad
 
 function getParameterDefinitions () {
   return [
@@ -28,12 +22,14 @@ function getParameterDefinitions () {
     {name: 'BottomText', initial: 'STANDARD', type: 'text', caption: 'Bottom Text', size: 30},
     {name: 'LeftText', initial: '45,LBS', type: 'text', caption: 'Left Text', size: 30},
     {name: 'RightText', initial: '20.4,KGS', type: 'text', caption: 'Right Text', size: 30},
-    {name: 'thickness', initial: 3, type: 'float', caption: 'Thickness'},
+    {name: 'thickness', initial: 4, type: 'float', caption: 'Thickness'},
 
   ];
 }
 
+
 function main (param) {
+  var mainObjects = []; // our stack of objects
   var allObjects = []; // our stack of objects
   var lineSegments = []; // our stack of line segments (when rendering vector text)
   var p = []; // our stack of extruded line segments
@@ -44,14 +40,24 @@ allObjects.push(revolveText(param.TopText, 80, 130, true, param.thickness).setCo
 allObjects.push(revolveText(param.BottomText, 80, 130, false, param.thickness).setColor(textColor));
 
 
+//var path = new CSG.Path2D([ [10,10], [-10,10], [-10,-10], [10,-20] ], /* closed = */ false);
+//allObjects.push(path.rectangularExtrude(5, 8, 0, false));
+
+// let fPurisa = fontAPI.Font3D.parse(purisa_ttf_data.buffer);
+// let cagPurisa = fontAPI.Font3D.cagFromString(fPurisa, "Hello", 14);
+// let csgPurisa = linear_extrude({ height: 5 }, cagPurisa[0].union(cagPurisa));
+
+// allObjects.push(csgPurisa);
+
   var b = allObjects[0].getBounds();
   var m = 2;
   //var w = b[1].x - b[0].x + m * 2;
   //var h = b[1].y - b[0].y + m * 2;
-  allObjects.push(weightPlateClock().rotateZ(45).translate([0,-254,-1]).setColor([.5,.5,.5]));
+  mainObjects.push(weightPlateClock().rotateZ(45).translate([0,-254,-1]).setColor([.5,.5,.5]));
 
-  return union(allObjects)
-  //return union(mainObjects).subtract(union(allObjects));
+  //return union(A().rectangularExtrude(5,3,16,false));
+
+  return union(mainObjects).union(allObjects);
 }
 //
 function straightText(text, thickness = 3, textSize = .9)
@@ -59,15 +65,20 @@ function straightText(text, thickness = 3, textSize = .9)
   var vSpacing = 40
   var textArray = text.split(',')
   var allText = [];
+
   var zh = vSpacing/2 * (max(0,textArray.length - 1));
   textArray.forEach((word) => {
     vector_text(-getTotalCharLen(word)/2,zh,word).forEach(function (s) {
-      allText.push(rectangular_extrude(s, {h:5, w:thickness}).scale(textSize));
-
+      allText.push(rectangular_extrude(s, {h:5, w:thickness, }).scale(textSize));
+     // allText.push(CSG.Path2D(s, false).rectangularExtrude(thickness, 5, 0, false))
   })
       zh-=vSpacing;
-  })
+  });
+
+
+
 return union(allText);
+
 }
 
 function revolveText(text, textAngle = 90, radius = 180, invert = true, thickness = 3, textSize = .9)
@@ -112,6 +123,32 @@ function getCharWidth(c)
   return max(10,vector_char(0,0,c).width);
 }
 
+function A() {
+  var cag0 = new CAG();
+  var cag00 = new CAG();
+  var cag001 = new CSG.Path2D([[173.84887519999998,-415.14885619999995]],false);
+  cag001 = cag001.appendPoint([253.99997999999997,-415.14885619999995]);
+  cag001 = cag001.appendPoint([413.73774519999995,0]);
+  cag001 = cag001.appendPoint([331.61108499999995,0]);
+  cag001 = cag001.appendPoint([299.155532,-85.51332659999998]);
+  cag001 = cag001.appendPoint([129.82221199999998,-85.51332659999998]);
+  cag001 = cag001.appendPoint([95.955548,0]);
+  cag001 = cag001.appendPoint([13.828887799999999,0]);
+  cag001 = cag001.close();
+
+  var cag002 = new CSG.Path2D([[214.488872,-305.0821982]],false);
+  cag002 = cag002.appendPoint([159.17332079999997,-162.5599872]);
+  cag002 = cag002.appendPoint([269.522201,-162.5599872]);
+  cag002 = cag002.close();
+
+    cag002 = cag002.innerToCAG();
+    cag00 = cag00.union(cag002);
+
+  cag00 = cag00.scale([0.01, -0.01]);
+  cag00 = cag00.translate([0,462.2799636]);
+  cag0 = cag0.union(cag00);
+  return cag0;
+}
 
 
   function weightPlateClock() { return union(
@@ -14984,9 +15021,6 @@ function getCharWidth(c)
       [11142,11143,11144],
       [11145,11146,11147]] })
     ); }
-    
-
-    
     
 
 ///////////////

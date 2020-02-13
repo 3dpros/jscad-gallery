@@ -38,16 +38,7 @@ namespace JscadGallery {
       this.viewer.resetCamera();
 
       //load the actual model
-      const message: WorkerRequest = { load: design };
-      this.worker.postMessage(message);
-
-      if (!document.location.hash.substring(1)) {
-        //load the preview
-        const message2: WorkerRequest = { load: design };
-        this.worker.postMessage(message2);
-      }
-
-      //TODO - show spinner while loading
+      this.loadHash(true);
 
     }
 
